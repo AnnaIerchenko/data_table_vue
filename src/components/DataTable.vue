@@ -10,17 +10,37 @@ const props = defineProps({
       required: true
     }
   })
-  const searchFilter = ref('')
+const searchFilter = ref('')
+const radioFilter = ref('')
 
 const filteredItems = computed(() => {
-  if(searchFilter.value !== ''){
-    return props.items.filter((item) => item.title.includes(searchFilter.value) || item.user.name.includes(searchFilter.value))
+  const items = props.items
+
+  switch(radioFilter.value){
+    case 'today':
+      // show items due tuday
+      items = items.filter(item => 
+        new Date(item.due_at).getDate() === new Date().getDate())
+      break
+    case 'past':
+      //show items past due
+      items = items.filter(item => new Date(item.due_at) < new Date())
+      break
   }
-  return props.items
+
+  if(searchFilter.value !== ''){
+    items = items.filter((item) => 
+      item.title.includes(searchFilter.value) || 
+      item.user.name.includes(searchFilter.value))
+  }
+  return items
 })
 
 const handleSearch = (search) => {
   searchFilter.value = search
+}
+const handleRadioFilter = (filter) => {
+  radioFilter.value = filter
 }
 </script>
 <template>
@@ -30,7 +50,7 @@ const handleSearch = (search) => {
       <search-form @search="handleSearch"/>
       <div class="flex items-center justify-end text-sm font-semibold">
       <!-- radio buttons -->
-        <filter-radio />
+        <filter-radio @filter="handleRadioFilter" />
       </div>
       <!-- list of filter for status -->
       <filter-drop-down />
