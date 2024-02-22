@@ -12,6 +12,7 @@ const props = defineProps({
   })
 const searchFilter = ref('')
 const radioFilter = ref('')
+const statusesFilter = ref([])
 
 const filteredItems = computed(() => {
   const items = props.items
@@ -28,6 +29,9 @@ const filteredItems = computed(() => {
       break
   }
 
+  if(statusesFilter.value.length){
+    items = items.filter(item => statusesFilter.value.includes(item.status))
+  }
   if(searchFilter.value !== ''){
     items = items.filter((item) => 
       item.title.includes(searchFilter.value) || 
@@ -42,6 +46,13 @@ const handleSearch = (search) => {
 const handleRadioFilter = (filter) => {
   radioFilter.value = filter
 }
+const handleCheckboxFilter = (filter) => {
+  // console.log(filter)
+  if(statusesFilter.value.includes(filter)){
+    return statusesFilter.value.splice(statusesFilter.value.indexOf(filter), 1)
+  }
+  return statusesFilter.value.push(filter)
+}
 </script>
 <template>
   <div class="bg-white relative border rounded-lg">
@@ -53,7 +64,7 @@ const handleRadioFilter = (filter) => {
         <filter-radio @filter="handleRadioFilter" />
       </div>
       <!-- list of filter for status -->
-      <filter-drop-down />
+      <filter-drop-down :items="items" @filter="handleCheckboxFilter"/>
     </div>
     
     <table class="w-full text-sm text-left text-gray-500">
